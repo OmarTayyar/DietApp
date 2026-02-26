@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		CA52927C2F444F3600740787 /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = CA52927B2F444F3600740787 /* FirebaseAI */; };
 		CA52927E2F444F3600740787 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = CA52927D2F444F3600740787 /* FirebaseAILogic */; };
+		CA52931A2F49193700740787 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CA5293192F49193700740787 /* FirebaseAuth */; };
+		CAC37CF82F4F4AE100287F13 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CAC37CF72F4F4AE100287F13 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA52927E2F444F3600740787 /* FirebaseAILogic in Frameworks */,
+				CAC37CF82F4F4AE100287F13 /* FirebaseFirestore in Frameworks */,
+				CA52931A2F49193700740787 /* FirebaseAuth in Frameworks */,
 				CA52927C2F444F3600740787 /* FirebaseAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,6 +44,7 @@
 			isa = PBXGroup;
 			children = (
 				CA5292332F3FD81500740787 /* DietApp */,
+				CA5293182F49192E00740787 /* Frameworks */,
 				CA5292322F3FD81500740787 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +55,13 @@
 				CA5292312F3FD81500740787 /* DietApp.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CA5293182F49192E00740787 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,6 +86,8 @@
 			packageProductDependencies = (
 				CA52927B2F444F3600740787 /* FirebaseAI */,
 				CA52927D2F444F3600740787 /* FirebaseAILogic */,
+				CA5293192F49193700740787 /* FirebaseAuth */,
+				CAC37CF72F4F4AE100287F13 /* FirebaseFirestore */,
 			);
 			productName = DietApp;
 			productReference = CA5292312F3FD81500740787 /* DietApp.app */;
@@ -366,6 +380,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CA5292412F412AF900740787 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAILogic;
+		};
+		CA5293192F49193700740787 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA5292412F412AF900740787 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		CAC37CF72F4F4AE100287F13 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA5292412F412AF900740787 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

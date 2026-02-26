@@ -7,7 +7,14 @@
 import SwiftUI
 
 struct LoginView: View {
+    
+    @State private var email = "yunuszade005@gmail.com"
+    @State private var password = "Yunusov2."
+    @State private var errorMessage = ""
+    @State private var isSignedIn = false
+    
     var body: some View {
+        NavigationStack {
             VStack {
                
                 Image(.dietAppLogo)
@@ -33,7 +40,7 @@ struct LoginView: View {
                 // SignUp / SignIn Buttons
                 HStack {
                     Button(action: {
-                        // Sign Up action
+                        
                     }) {
                         Text("Sign Up")
                             .fontWeight(.bold)
@@ -45,7 +52,15 @@ struct LoginView: View {
                     }
 
                     Button(action: {
-                        // Sign In action
+                        FirebaseAuthService.shared.loginUser(email: email, password: password) { result in
+                            
+                            switch result {
+                            case .success:
+                                isSignedIn = true
+                            case .failure(let error):
+                                errorMessage = error.localizedDescription
+                            }
+                        }
                     }) {
                         Text("Sign In")
                             .fontWeight(.bold)
@@ -61,16 +76,16 @@ struct LoginView: View {
                     }
                 }
 
-                // Email & Password Fields
+                
                 VStack(spacing: 16) {
-                    TextField("Email", text: .constant(""))
+                    TextField("Email", text: $email)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(20)
                         .shadow(radius: 3)
                         .padding(.top, 24)
 
-                    SecureField("Password", text: .constant(""))
+                    SecureField("Password", text: $password)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(20)
@@ -124,10 +139,20 @@ struct LoginView: View {
                 }
                 .padding(.top, 16)
                 .padding(.horizontal, 32)
+                
+                if !errorMessage.isEmpty {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 40)
+            .navigationDestination(isPresented: $isSignedIn) {
+                MainView()
+            }
+            .navigationBarBackButtonHidden(true)
         }
+    }
 }
 
 #Preview {

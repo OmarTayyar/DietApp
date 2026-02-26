@@ -12,6 +12,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
       FirebaseApp.configure()
+      
+      print("Project ID:", FirebaseApp.app()?.options.projectID ?? "NO PROJECT")
     return true
   }
 }
@@ -22,7 +24,7 @@ struct DietAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            RootView()
         }
     }
 }
