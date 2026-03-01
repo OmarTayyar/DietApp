@@ -6,12 +6,31 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct RecipeCard: View {
     
     let recipe: Recipe
     @State private var isFavorite: Bool = false
     var onFavoriteTap: (() -> Void)? = nil
+    
+    func addToFavorites(recipe: Recipe) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .collection("favorites")
+            .document(recipe.id)
+            .setData([
+                "title": recipe.title,
+                "cookingTime": recipe.cookingTime,
+                "calories": recipe.calories,
+                "imageUrl": recipe.imageUrl,
+                "category": recipe.category
+            ])
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -46,7 +65,7 @@ struct RecipeCard: View {
                 
                 Button {
                     isFavorite.toggle()
-                    onFavoriteTap?()
+                    addToFavorites(recipe: recipe)
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .foregroundColor(isFavorite ? .red : .white)

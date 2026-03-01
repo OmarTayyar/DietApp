@@ -29,6 +29,7 @@ struct MainView: View {
                         viewModel.selectedCategory = category
                     } label: {
                         Text(category)
+                            .fontWeight(.semibold)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(
