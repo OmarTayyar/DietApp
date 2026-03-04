@@ -25,7 +25,12 @@ struct SearchView: View {
                 } else {
                     List {
                         ForEach(viewModel.filteredRecipes) { recipe in
-                            FavoriteRowView(recipe: recipe)
+                            NavigationLink {
+                                DetailView(recipe: recipe)
+                            } label: {
+                                FavoriteRowView(recipe: recipe)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                     .listStyle(.plain)

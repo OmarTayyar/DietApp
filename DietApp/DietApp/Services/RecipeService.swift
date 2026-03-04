@@ -21,21 +21,27 @@ final class RecipeService {
                 
                 let recipes = snapshot?.documents.compactMap { doc -> Recipe? in
                     let data = doc.data()
-                    
+                    print(data["instructions"] ?? "NO INSTRUCTIONS FIELD")
                     return Recipe(
                         id: doc.documentID,
                         title: data["title"] as? String ?? "",
                         cookingTime: data["cookingTime"] as? Int ?? 0,
                         calories: data["calories"] as? Int ?? 0,
                         imageUrl: data["imageUrl"] as? String ?? "",
-                        category: data["category"] as? String ?? ""
+                        category: data["category"] as? String ?? "",
+                        ingredients: data["ingredients"] as?  [String] ?? [],
+                        instructions: data["instructions"] as? [String] ?? []
                     )
+                    
+                    
                 } ?? []
+                
                 
                 print(snapshot?.documents.first?.data() ?? "NO DATA")
                 
                 completion(.success(recipes))
             }
+        
     }
     
 }

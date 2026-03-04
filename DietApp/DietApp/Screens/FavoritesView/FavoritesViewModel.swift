@@ -34,7 +34,9 @@ final class FavoritesViewModel: ObservableObject {
                         cookingTime: data["cookingTime"] as? Int ?? 0,
                         calories: data["calories"] as? Int ?? 0,
                         imageUrl: data["imageUrl"] as? String ?? "",
-                        category: data["category"] as? String ?? ""
+                        category: data["category"] as? String ?? "",
+                        ingredients: data["ingredients"] as?  [String] ?? [],
+                        instructions: data["instructions"] as? [String] ?? []
                     )
                 }
             }

@@ -34,11 +34,6 @@ struct FavoriteRowView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
         }
         .padding(.vertical, 6)
     }
