@@ -29,7 +29,7 @@ struct MainTabbarView: View {
             }
 
             NavigationStack {
-                DietView()
+                MyDietView()
             }
             .tabItem {
                 Image(systemName: "leaf.fill")

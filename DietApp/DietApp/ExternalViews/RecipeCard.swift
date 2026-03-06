@@ -92,7 +92,7 @@ struct RecipeCard: View {
             .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color.white)
+        .background(Color.red.opacity(0.06))
         .cornerRadius(24)
         .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
     }
