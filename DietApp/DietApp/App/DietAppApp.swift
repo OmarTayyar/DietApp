@@ -13,13 +13,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
       FirebaseApp.configure()
       
-      print("Project ID:", FirebaseApp.app()?.options.projectID ?? "NO PROJECT")
     return true
   }
 }
 
 @main
 struct DietAppApp: App {
+   
+    
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {

@@ -14,7 +14,6 @@ struct RootView: View {
     @State private var isLoggedIn = false
     
     var body: some View {
-        
         Group {
             if isLoading {
                 SplashView()
@@ -25,15 +24,16 @@ struct RootView: View {
             }
         }
         .onAppear {
-            checkAuth()
+            listenAuth()
         }
     }
     
-    private func checkAuth() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.isLoggedIn = Auth.auth().currentUser != nil
-            self.isLoading = false
+    private func listenAuth() {
+        Auth.auth().addStateDidChangeListener { _, user in
+            DispatchQueue.main.async {
+                self.isLoggedIn = user != nil
+                self.isLoading = false
+            }
         }
     }
 }
-

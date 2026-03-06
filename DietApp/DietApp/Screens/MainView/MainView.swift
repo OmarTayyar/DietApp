@@ -61,8 +61,6 @@ struct MainView: View {
                             .frame(maxWidth: .infinity)
                     }
                     
-                    
-                    
                     let columns = [
                         GridItem(.flexible(), spacing: 16),
                         GridItem(.flexible(), spacing: 16)

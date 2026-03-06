@@ -10,34 +10,9 @@ import FirebaseFirestore
 import FirebaseAuth
 import Combine
 
-// MARK: - Day of Week
-enum WeekDay: String, CaseIterable, Identifiable {
-    case monday    = "Monday"
-    case tuesday   = "Tuesday"
-    case wednesday = "Wednesday"
-    case thursday  = "Thursday"
-    case friday    = "Friday"
-    case saturday  = "Saturday"
-    case sunday    = "Sunday"
-
-    var id: String { rawValue }
-}
-
-// MARK: - DietDayPlan
-struct DietDayPlan: Identifiable {
-    let id: String          // weekDay rawValue
-    let day: WeekDay
-    var recipes: [Recipe]
-
-    var totalCalories: Int { recipes.reduce(0) { $0 + $1.calories } }
-    var totalDishes: Int   { recipes.count }
-}
-
-// MARK: - ViewModel
 @MainActor
 class DietPlanViewModel: ObservableObject {
 
-    // MARK: Published
     @Published var allRecipes: [Recipe]        = []
     @Published var selectedDay: WeekDay        = .monday
     @Published var selectedRecipeIds: [WeekDay: Set<String>] = {
@@ -48,8 +23,8 @@ class DietPlanViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isSaving: Bool  = false
     @Published var errorMessage: String?
+    @Published var showAddSheet: Bool = false
 
-    // MARK: Computed
     var dietDayPlans: [DietDayPlan] {
         WeekDay.allCases.compactMap { day in
             let ids = selectedRecipeIds[day] ?? []
@@ -60,14 +35,9 @@ class DietPlanViewModel: ObservableObject {
     }
 
     var hasDietPlan: Bool { !dietDayPlans.isEmpty }
-
-    // Sheet state
-    @Published var showAddSheet: Bool = false
-
-    // MARK: Private
     private let db = Firestore.firestore()
-
-    // MARK: - Fetch Recipes
+    
+    
     func fetchRecipes() {
         isLoading = true
         db.collection("recipes").getDocuments { [weak self] snapshot, error in
@@ -92,8 +62,7 @@ class DietPlanViewModel: ObservableObject {
             } ?? []
         }
     }
-
-    // MARK: - Toggle recipe for selected day
+    
     func toggleRecipe(_ recipe: Recipe) {
         if selectedRecipeIds[selectedDay]?.contains(recipe.id) == true {
             selectedRecipeIds[selectedDay]?.remove(recipe.id)
@@ -106,7 +75,6 @@ class DietPlanViewModel: ObservableObject {
         selectedRecipeIds[selectedDay]?.contains(recipe.id) == true
     }
 
-    // MARK: - Total for current AddDishes selection
     var currentSelectionCount: Int {
         selectedRecipeIds.values.reduce(0) { $0 + $1.count }
     }
@@ -118,7 +86,6 @@ class DietPlanViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Reset
     func resetPlan() {
         WeekDay.allCases.forEach { selectedRecipeIds[$0] = [] }
     }
