@@ -6,10 +6,19 @@
 //
 
 import FirebaseAuth
+import Combine
 
 final class FirebaseAuthService {
     
     static let shared = FirebaseAuthService()
+        
+        @Published var isLoggedIn: Bool = false
+        
+        private init() {
+            listenToAuthState { user in
+                self.isLoggedIn = user != nil
+            }
+        }
     
     func registerUser(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { result, error in

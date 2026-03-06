@@ -147,14 +147,10 @@ struct LoginView: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 40)
-            .navigationDestination(isPresented: $isSignedIn) {
-                MainView()
+            .fullScreenCover(isPresented: $isSignedIn) {
+                MainTabbarView()
             }
             .navigationBarBackButtonHidden(true)
         }
     }
-}
-
-#Preview {
-    LoginView()
 }
