@@ -8,10 +8,10 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @State private var email = "yunuszade005@gmail.com"
-    @State private var password = "Yunusov2."
+    @State private var email = ""
+    @State private var password = ""
     @State private var errorMessage = ""
-    @State private var isSignedIn = false
+    @State private var showSignUp = false
     
     var body: some View {
         NavigationStack {
@@ -22,25 +22,21 @@ struct LoginView: View {
                     .scaledToFit()
                     .frame(width: 150, height: 150)
 
-                // Title
                 Text("Create a meal plan\non the go")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
                     .padding(.bottom)
-                
 
-                // Subtitle
                 Text("Choose dishes, view recipes, add to favourites, and create a meal plan")
                     .font(.body)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.bottom)
 
-                // SignUp / SignIn Buttons
                 HStack {
                     Button(action: {
-                        
+                        showSignUp = true
                     }) {
                         Text("Sign Up")
                             .fontWeight(.bold)
@@ -53,10 +49,9 @@ struct LoginView: View {
 
                     Button(action: {
                         FirebaseAuthService.shared.loginUser(email: email, password: password) { result in
-                            
                             switch result {
                             case .success:
-                                isSignedIn = true
+                                break // RootView auth listener handles navigation
                             case .failure(let error):
                                 errorMessage = error.localizedDescription
                             }
@@ -76,32 +71,30 @@ struct LoginView: View {
                     }
                 }
 
-                
                 VStack(spacing: 16) {
                     TextField("Email", text: $email)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.emailAddress)
                         .padding()
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(20)
-                        .shadow(radius: 3)
+                        .shadow(color: Color(.label).opacity(0.1), radius: 3)
                         .padding(.top, 24)
 
                     SecureField("Password", text: $password)
                         .padding()
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(20)
-                        .shadow(radius: 3)
+                        .shadow(color: Color(.label).opacity(0.1), radius: 3)  
                 }
                 .padding(.horizontal, 32)
-
-                // OR Section
                 Text("OR")
                     .font(.subheadline)
                     .padding(.top, 16)
 
-                // Google / Apple Login
                 HStack {
                     Button(action: {
-                        print("Google Login Success")
+                        print("Google Login")
                     }) {
                         HStack {
                             Image(.googleLogo)
@@ -119,7 +112,7 @@ struct LoginView: View {
                     }
 
                     Button(action: {
-                        print("Apple Login Success")
+                        print("Apple Login")
                     }) {
                         HStack {
                             Image(systemName: "applelogo")
@@ -143,14 +136,15 @@ struct LoginView: View {
                 if !errorMessage.isEmpty {
                     Text(errorMessage)
                         .foregroundColor(.red)
+                        .padding(.top, 8)
                 }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 40)
-            .fullScreenCover(isPresented: $isSignedIn) {
-                MainTabbarView()
-            }
             .navigationBarBackButtonHidden(true)
+            .sheet(isPresented: $showSignUp) {
+                SignUpView()
+            }
         }
     }
 }

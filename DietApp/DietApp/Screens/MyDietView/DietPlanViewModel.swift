@@ -13,18 +13,19 @@ import Combine
 @MainActor
 class DietPlanViewModel: ObservableObject {
 
-    @Published var allRecipes: [Recipe]        = []
-    @Published var selectedDay: WeekDay        = .monday
+    // MARK: - Published
+    @Published var allRecipes: [Recipe] = []
+    @Published var selectedDay: WeekDay = .monday
     @Published var selectedRecipeIds: [WeekDay: Set<String>] = {
         var dict: [WeekDay: Set<String>] = [:]
         WeekDay.allCases.forEach { dict[$0] = [] }
         return dict
     }()
     @Published var isLoading: Bool = false
-    @Published var isSaving: Bool  = false
     @Published var errorMessage: String?
     @Published var showAddSheet: Bool = false
 
+    // MARK: - Computed
     var dietDayPlans: [DietDayPlan] {
         WeekDay.allCases.compactMap { day in
             let ids = selectedRecipeIds[day] ?? []
@@ -35,45 +36,6 @@ class DietPlanViewModel: ObservableObject {
     }
 
     var hasDietPlan: Bool { !dietDayPlans.isEmpty }
-    private let db = Firestore.firestore()
-    
-    
-    func fetchRecipes() {
-        isLoading = true
-        db.collection("recipes").getDocuments { [weak self] snapshot, error in
-            guard let self else { return }
-            self.isLoading = false
-            if let error {
-                self.errorMessage = error.localizedDescription
-                return
-            }
-            self.allRecipes = snapshot?.documents.compactMap { doc -> Recipe? in
-                let data = doc.data()
-                return Recipe(
-                    id: doc.documentID,
-                    title:       data["title"]       as? String ?? "",
-                    cookingTime: data["cookingTime"] as? Int    ?? 0,
-                    calories:    data["calories"]    as? Int    ?? 0,
-                    imageUrl:    data["imageUrl"]    as? String ?? "",
-                    category:    data["category"]    as? String ?? "",
-                    ingredients: (data["ingredients"] as? [Any])?.compactMap { $0 as? String } ?? [],
-                    instructions:(data["instructions"] as? [Any])?.compactMap { $0 as? String } ?? []
-                )
-            } ?? []
-        }
-    }
-    
-    func toggleRecipe(_ recipe: Recipe) {
-        if selectedRecipeIds[selectedDay]?.contains(recipe.id) == true {
-            selectedRecipeIds[selectedDay]?.remove(recipe.id)
-        } else {
-            selectedRecipeIds[selectedDay]?.insert(recipe.id)
-        }
-    }
-
-    func isSelected(_ recipe: Recipe) -> Bool {
-        selectedRecipeIds[selectedDay]?.contains(recipe.id) == true
-    }
 
     var currentSelectionCount: Int {
         selectedRecipeIds.values.reduce(0) { $0 + $1.count }
@@ -86,7 +48,76 @@ class DietPlanViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Private
+    private let service = RecipeService()
+    private let db = Firestore.firestore()
+
+    // MARK: - Fetch Recipes (uses shared RecipeService)
+    func fetchRecipes() {
+        guard allRecipes.isEmpty else { return }
+        isLoading = true
+        service.fetchRecipes { [weak self] result in
+            guard let self else { return }
+            self.isLoading = false
+            switch result {
+            case .success(let recipes):
+                self.allRecipes = recipes
+            case .failure(let error):
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    // MARK: - Toggle selection
+    func toggleRecipe(_ recipe: Recipe) {
+        if selectedRecipeIds[selectedDay]?.contains(recipe.id) == true {
+            selectedRecipeIds[selectedDay]?.remove(recipe.id)
+        } else {
+            selectedRecipeIds[selectedDay]?.insert(recipe.id)
+        }
+    }
+
+    func isSelected(_ recipe: Recipe) -> Bool {
+        selectedRecipeIds[selectedDay]?.contains(recipe.id) == true
+    }
+
+    // MARK: - Persist to Firestore
+    func saveDietPlan() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let planRef = db.collection("users").document(uid).collection("dietPlan")
+        
+        for (day, ids) in selectedRecipeIds {
+            planRef.document(day.rawValue).setData(["recipeIds": Array(ids)])
+        }
+    }
+
+    // MARK: - Load from Firestore
+    func loadDietPlan() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let planRef = db.collection("users").document(uid).collection("dietPlan")
+        
+        planRef.getDocuments { [weak self] snapshot, error in
+            guard let self, let documents = snapshot?.documents else { return }
+            
+            var loaded: [WeekDay: Set<String>] = [:]
+            WeekDay.allCases.forEach { loaded[$0] = [] }
+            
+            for doc in documents {
+                if let day = WeekDay(rawValue: doc.documentID),
+                   let ids = doc.data()["recipeIds"] as? [String] {
+                    loaded[day] = Set(ids)
+                }
+            }
+            
+            DispatchQueue.main.async {
+                self.selectedRecipeIds = loaded
+            }
+        }
+    }
+
+    // MARK: - Reset
     func resetPlan() {
         WeekDay.allCases.forEach { selectedRecipeIds[$0] = [] }
+        saveDietPlan()
     }
 }

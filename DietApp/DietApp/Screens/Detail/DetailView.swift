@@ -9,11 +9,8 @@ import SwiftUI
 
 struct DetailView: View {
     
-    @StateObject private var viewModel: DetailViewModel
-    
-    init(recipe: Recipe) {
-        _viewModel = StateObject(wrappedValue: DetailViewModel(recipe: recipe))
-    }
+    let recipe: Recipe
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ScrollView {
@@ -23,10 +20,9 @@ struct DetailView: View {
                 ZStack(alignment: .topLeading) {
                     let headerHeight: CGFloat = 320
                     
-                    // Force header to screen width and fixed height in all phases
                     GeometryReader { proxy in
                         let width = proxy.size.width
-                        AsyncImage(url: URL(string: viewModel.recipe.imageUrl)) { phase in
+                        AsyncImage(url: URL(string: recipe.imageUrl)) { phase in
                             switch phase {
                             case .success(let image):
                                 image
@@ -35,23 +31,17 @@ struct DetailView: View {
                                     .frame(width: width, height: headerHeight)
                                     .clipped()
                             case .empty:
-                                // Placeholder matches final size/layout
                                 Color.gray.opacity(0.2)
                                     .frame(width: width, height: headerHeight)
-                                    .clipped()
                             case .failure:
                                 Color.gray.opacity(0.2)
                                     .frame(width: width, height: headerHeight)
-                                    .clipped()
                             @unknown default:
                                 Color.gray.opacity(0.2)
                                     .frame(width: width, height: headerHeight)
-                                    .clipped()
                             }
                         }
-                        .transaction { tx in
-                            tx.animation = nil
-                        }
+                        .transaction { tx in tx.animation = nil }
                     }
                     .frame(height: headerHeight)
                     
@@ -61,6 +51,17 @@ struct DetailView: View {
                         endPoint: .bottom
                     )
                     .frame(height: 200)
+                    
+                    // MARK: - Back Button
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.white)
+                            .padding(10)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                    }
+                    .padding(.top, 55)
+                    .padding(.leading, 16)
                 }
                 
                 // MARK: - CARD CONTAINER
@@ -68,22 +69,22 @@ struct DetailView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         
                         // MARK: - TITLE
-                        Text(viewModel.recipe.title)
+                        Text(recipe.title)
                             .font(.largeTitle.bold())
                             .padding(.top)
                         
                         // MARK: - INFO CARDS
                         HStack(spacing: 12) {
                             infoCard(icon: "clock",
-                                     value: "\(viewModel.recipe.cookingTime) mins",
+                                     value: "\(recipe.cookingTime) mins",
                                      label: "COOKING")
                             
                             infoCard(icon: "flame",
-                                     value: "\(viewModel.recipe.calories) kcal",
+                                     value: "\(recipe.calories) kcal",
                                      label: "CALORIES")
                             
                             infoCard(icon: "leaf",
-                                     value: viewModel.recipe.category,
+                                     value: recipe.category,
                                      label: "CATEGORY")
                         }
                         
@@ -91,7 +92,7 @@ struct DetailView: View {
                         Text("Ingredients")
                             .font(.title2.bold())
                         
-                        ForEach(viewModel.recipe.ingredients, id: \.self) { ingredient in
+                        ForEach(recipe.ingredients, id: \.self) { ingredient in
                             Text("• \(ingredient)")
                                 .foregroundColor(.secondary)
                         }
@@ -102,9 +103,8 @@ struct DetailView: View {
                         Text("Instructions")
                             .font(.title2.bold())
                         
-                        ForEach(Array(viewModel.recipe.instructions.enumerated()), id: \.offset) { index, step in
+                        ForEach(Array(recipe.instructions.enumerated()), id: \.offset) { index, step in
                             HStack(alignment: .top, spacing: 12) {
-                                
                                 Text("\(index + 1)")
                                     .font(.headline)
                                     .frame(width: 28, height: 28)
@@ -117,7 +117,7 @@ struct DetailView: View {
                             .padding(.vertical, 4)
                         }
                     }
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 16)
                     .padding(.bottom, 16)
                 }
                 .background(Color(.systemBackground))
@@ -138,6 +138,8 @@ struct DetailView: View {
             
             Text(value)
                 .font(.headline)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             
             Text(label)
                 .font(.caption)
@@ -149,5 +151,3 @@ struct DetailView: View {
         .cornerRadius(16)
     }
 }
-
-

@@ -12,36 +12,39 @@ struct MyDietView: View {
     @StateObject private var viewModel = DietPlanViewModel()
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color(.systemGroupedBackground).ignoresSafeArea()
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
 
-                if viewModel.hasDietPlan {
-                    dietPlanContent
-                } else {
-                    emptyStateContent
-                }
+            if viewModel.hasDietPlan {
+                dietPlanContent
+            } else {
+                emptyStateContent
             }
-            .navigationTitle("My Diet")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if viewModel.hasDietPlan {
-                        Button(action: { viewModel.showAddSheet = true }) {
-                            Image(systemName: "pencil")
-                                .foregroundColor(.primary)
-                                .frame(width: 36, height: 36)
-                                .background(Color(.systemGray6))
-                                .clipShape(Circle())
-                        }
+        }
+        .navigationTitle("My Diet")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if viewModel.hasDietPlan {
+                    Button(action: { viewModel.showAddSheet = true }) {
+                        Image(systemName: "pencil")
+                            .foregroundColor(.primary)
+                            .frame(width: 36, height: 36)
+                            .background(Color(.systemGray6))
+                            .clipShape(Circle())
                     }
                 }
             }
-            .sheet(isPresented: $viewModel.showAddSheet) {
-                AddDishesView(viewModel: viewModel)
-            }
         }
-        .navigationViewStyle(.stack)
+        .sheet(isPresented: $viewModel.showAddSheet, onDismiss: {
+            viewModel.saveDietPlan()
+        }) {
+            AddDishesView(viewModel: viewModel)
+        }
+        .onAppear {
+            viewModel.fetchRecipes()
+            viewModel.loadDietPlan()
+        }
     }
 
     // MARK: - Empty State
@@ -71,7 +74,7 @@ struct MyDietView: View {
                 .foregroundColor(.black)
                 .padding(.horizontal, 32)
                 .padding(.vertical, 18)
-                .background(Color.red)
+                .background(Color.green)
                 .clipShape(Capsule())
             }
             .padding(.top, 8)
@@ -84,7 +87,7 @@ struct MyDietView: View {
     // MARK: - Diet Plan Content
     private var dietPlanContent: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0, pinnedViews: []) {
+            LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(viewModel.dietDayPlans) { dayPlan in
                     daySection(dayPlan)
                 }
@@ -97,7 +100,6 @@ struct MyDietView: View {
     private func daySection(_ dayPlan: DietDayPlan) -> some View {
         VStack(alignment: .leading, spacing: 10) {
 
-            // Day header
             HStack {
                 Text(dayPlan.day.rawValue)
                     .font(.title3.bold())
@@ -113,7 +115,6 @@ struct MyDietView: View {
             .padding(.top, 20)
             .padding(.bottom, 2)
 
-            // Horizontal scroll of recipe cards
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(dayPlan.recipes) { recipe in

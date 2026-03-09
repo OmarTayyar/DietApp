@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
 import Combine
 
 final class SearchViewModel: ObservableObject {
@@ -17,37 +16,25 @@ final class SearchViewModel: ObservableObject {
     @Published var cookingTimeRange: ClosedRange<Double> = 0...120
     @Published var calorieRange: ClosedRange<Double> = 0...1000
     
-    private let db = Firestore.firestore()
+    private let service = RecipeService()
     
     init() {
         fetchRecipes()
     }
     
     func fetchRecipes() {
-        db.collection("recipes")
-            .getDocuments { snapshot, error in
-                
-                guard let documents = snapshot?.documents else { return }
-                
-                self.recipes = documents.compactMap { doc in
-                    let data = doc.data()
-                    
-                    return Recipe(
-                        id: doc.documentID,
-                        title: data["title"] as? String ?? "",
-                        cookingTime: data["cookingTime"] as? Int ?? 0,
-                        calories: data["calories"] as? Int ?? 0,
-                        imageUrl: data["imageUrl"] as? String ?? "",
-                        category: data["category"] as? String ?? "",
-                        ingredients: data["ingredients"] as? [String] ?? [],
-                        instructions: data["instructions"] as? [String] ?? []
-                    )
-                }
+        service.fetchRecipes { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let recipes):
+                self.recipes = recipes
+            case .failure(let error):
+                print("SearchViewModel fetch error: \(error.localizedDescription)")
             }
+        }
     }
     
     var filteredRecipes: [Recipe] {
-        
         var result = recipes
         
         if !searchText.isEmpty {

@@ -15,33 +15,29 @@ final class RecipeService {
         db.collection("recipes")
             .getDocuments { snapshot, error in
                 if let error = error {
-                    completion(.failure(error))
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
                     return
                 }
                 
                 let recipes = snapshot?.documents.compactMap { doc -> Recipe? in
                     let data = doc.data()
-                    print(data["instructions"] ?? "NO INSTRUCTIONS FIELD")
                     return Recipe(
                         id: doc.documentID,
-                        title: data["title"] as? String ?? "",
-                        cookingTime: data["cookingTime"] as? Int ?? 0,
-                        calories: data["calories"] as? Int ?? 0,
-                        imageUrl: data["imageUrl"] as? String ?? "",
-                        category: data["category"] as? String ?? "",
-                        ingredients: data["ingredients"] as?  [String] ?? [],
+                        title:        data["title"]       as? String ?? "",
+                        cookingTime:  data["cookingTime"] as? Int    ?? 0,
+                        calories:     data["calories"]    as? Int    ?? 0,
+                        imageUrl:     data["imageUrl"]    as? String ?? "",
+                        category:     data["category"]    as? String ?? "",
+                        ingredients:  data["ingredients"] as? [String] ?? [],
                         instructions: data["instructions"] as? [String] ?? []
                     )
-                    
-                    
                 } ?? []
                 
-                
-                print(snapshot?.documents.first?.data() ?? "NO DATA")
-                
-                completion(.success(recipes))
+                DispatchQueue.main.async {
+                    completion(.success(recipes))
+                }
             }
-        
     }
-    
 }

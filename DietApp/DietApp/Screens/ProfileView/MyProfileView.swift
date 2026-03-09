@@ -14,21 +14,21 @@ struct MyProfileView: View {
 
     // MARK: - State
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
+    @AppStorage("profileImageData") private var profileImageData: Data?
+    @AppStorage("headerImageData") private var headerImageData: Data?
 
-    @State private var profileImage: UIImage?       = nil
-    @State private var headerImage: UIImage?        = nil
-
-    @State private var showProfileImagePicker: Bool = false
-    @State private var showHeaderImagePicker: Bool  = false
-    @State private var profileImageSource: UIImagePickerController.SourceType = .photoLibrary
-    @State private var headerImageSource: UIImagePickerController.SourceType  = .photoLibrary
+    @State private var profileImage: UIImage? = nil
+    @State private var headerImage: UIImage? = nil
 
     @State private var showProfileSourceSheet: Bool = false
-    @State private var showHeaderSourceSheet: Bool  = false
-    @State private var showLogoutAlert: Bool        = false
+    @State private var showHeaderSourceSheet: Bool = false
+    @State private var showProfileImagePicker: Bool = false
+    @State private var showHeaderImagePicker: Bool = false
+    @State private var profileImageSource: UIImagePickerController.SourceType = .photoLibrary
+    @State private var headerImageSource: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showLogoutAlert: Bool = false
 
-
-    // User info from Firebase
+    // MARK: - User Info
     private var userEmail: String {
         Auth.auth().currentUser?.email ?? ""
     }
@@ -40,71 +40,15 @@ struct MyProfileView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0) {
-
-                // MARK: Header Banner
                 headerBanner
-
-                // MARK: Profile Info
-                VStack(spacing: 0) {
-                    // Name
-                    Text(userName)
-                        .font(.title3.bold())
-                        .padding(.top, 12)
-                        .padding(.bottom, 16)
-
-                    // Mail row
-                    infoRow(label: "Mail", value: userEmail)
-
-                    Divider().padding(.horizontal, 20)
-
-                    // MARK: Dark Mode
-                    HStack(spacing: 14) {
-                        Image(systemName: "moon")
-                            .font(.system(size: 18))
-                            .foregroundColor(.primary)
-                            .frame(width: 24)
-
-                        Text("Dark mode")
-                            .font(.body)
-
-                        Spacer()
-
-                        Toggle("", isOn: $isDarkMode)
-                            .labelsHidden()
-                            .tint(Color(.systemGray3))
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 18)
-
-                    Divider().padding(.horizontal, 20)
-
-                    // MARK: Log Out
-                    Button(action: { showLogoutAlert = true }) {
-                        HStack(spacing: 14) {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .font(.system(size: 18))
-                                .foregroundColor(.primary)
-                                .frame(width: 24)
-
-                            Text("Log out")
-                                .font(.body)
-                                .foregroundColor(.primary)
-
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 18)
-                    }
-
-                    Divider().padding(.horizontal, 20)
-                }
-                .background(Color(.systemBackground))
+                profileInfoSection
             }
         }
         .ignoresSafeArea(edges: .top)
         .preferredColorScheme(isDarkMode ? .dark : .light)
+        .onAppear { loadSavedImages() }
 
-        // MARK: - Alerts & Sheets
+        // MARK: - Profile source sheet
         .confirmationDialog("Choose photo source", isPresented: $showProfileSourceSheet, titleVisibility: .visible) {
             Button("Photo Library") {
                 profileImageSource = .photoLibrary
@@ -119,6 +63,7 @@ struct MyProfileView: View {
             Button("Cancel", role: .cancel) {}
         }
 
+        // MARK: - Header source sheet
         .confirmationDialog("Choose background photo", isPresented: $showHeaderSourceSheet, titleVisibility: .visible) {
             Button("Photo Library") {
                 headerImageSource = .photoLibrary
@@ -135,12 +80,12 @@ struct MyProfileView: View {
 
         .sheet(isPresented: $showProfileImagePicker) {
             ImagePicker(sourceType: profileImageSource, selectedImage: $profileImage)
+                .onDisappear { saveProfileImage() }
         }
-
         .sheet(isPresented: $showHeaderImagePicker) {
             ImagePicker(sourceType: headerImageSource, selectedImage: $headerImage)
+                .onDisappear { saveHeaderImage() }
         }
-
         .alert("Do you want to log out?", isPresented: $showLogoutAlert) {
             Button("Log out", role: .destructive) { logOut() }
             Button("Cancel", role: .cancel) {}
@@ -150,8 +95,6 @@ struct MyProfileView: View {
     // MARK: - Header Banner
     private var headerBanner: some View {
         ZStack(alignment: .bottom) {
-
-            // Background color / image
             Group {
                 if let headerImage {
                     Image(uiImage: headerImage)
@@ -164,7 +107,7 @@ struct MyProfileView: View {
             .frame(height: 200)
             .clipped()
 
-            // Edit header button (bottom-right of banner)
+            // Edit header button
             VStack {
                 HStack {
                     Spacer()
@@ -182,7 +125,7 @@ struct MyProfileView: View {
                 Spacer()
             }
             .frame(height: 200)
-            
+
             profileAvatar
                 .offset(y: 50)
         }
@@ -192,8 +135,8 @@ struct MyProfileView: View {
 
     // MARK: - Profile Avatar
     private var profileAvatar: some View {
-           ZStack(alignment: .bottomTrailing) {
-              Group {
+        ZStack(alignment: .bottomTrailing) {
+            Group {
                 if let profileImage {
                     Image(uiImage: profileImage)
                         .resizable()
@@ -225,6 +168,58 @@ struct MyProfileView: View {
         }
     }
 
+    // MARK: - Profile Info Section
+    private var profileInfoSection: some View {
+        VStack(spacing: 0) {
+            Text(userName)
+                .font(.title3.bold())
+                .padding(.top, 12)
+                .padding(.bottom, 16)
+
+            infoRow(label: "Mail", value: userEmail)
+
+            Divider().padding(.horizontal, 20)
+
+            // Dark Mode Toggle
+            HStack(spacing: 14) {
+                Image(systemName: "moon")
+                    .font(.system(size: 18))
+                    .foregroundColor(.primary)
+                    .frame(width: 24)
+                Text("Dark mode")
+                    .font(.body)
+                Spacer()
+                Toggle("", isOn: $isDarkMode)
+                    .labelsHidden()
+                    .tint(Color(.systemGray3))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 18)
+
+            Divider().padding(.horizontal, 20)
+
+            // Log Out
+            Button(action: { showLogoutAlert = true }) {
+                HStack(spacing: 14) {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.system(size: 18))
+                        .foregroundColor(.primary)
+                        .frame(width: 24)
+                    Text("Log out")
+                        .font(.body)
+                        .foregroundColor(.primary)
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 18)
+            }
+
+            Divider().padding(.horizontal, 20)
+        }
+        .background(Color(.systemBackground))
+    }
+
+    // MARK: - Info Row
     private func infoRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
@@ -240,9 +235,26 @@ struct MyProfileView: View {
         .padding(.vertical, 14)
     }
 
+    // MARK: - Image Persistence
+    private func saveProfileImage() {
+        profileImageData = profileImage?.jpegData(compressionQuality: 0.8)
+    }
+
+    private func saveHeaderImage() {
+        headerImageData = headerImage?.jpegData(compressionQuality: 0.8)
+    }
+
+    private func loadSavedImages() {
+        if let data = profileImageData {
+            profileImage = UIImage(data: data)
+        }
+        if let data = headerImageData {
+            headerImage = UIImage(data: data)
+        }
+    }
+
+    // MARK: - Log Out
     private func logOut() {
-        try? Auth.auth().signOut()
+        FirebaseAuthService.shared.signOut()
     }
 }
-
-

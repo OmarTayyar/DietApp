@@ -13,45 +13,23 @@ struct RecipeCard: View {
     
     let recipe: Recipe
     @State private var isFavorite: Bool = false
-    var onFavoriteTap: (() -> Void)? = nil
-    
-    func addToFavorites(recipe: Recipe) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        
-        Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .collection("favorites")
-            .document(recipe.id)
-            .setData([
-                "title": recipe.title,
-                "cookingTime": recipe.cookingTime,
-                "calories": recipe.calories,
-                "imageUrl": recipe.imageUrl,
-                "category": recipe.category
-            ])
-    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             
             ZStack(alignment: .topTrailing) {
                 
-                
                 ZStack {
                     AsyncImage(url: URL(string: recipe.imageUrl)) { phase in
                         switch phase {
                         case .empty:
                             Color.gray.opacity(0.1)
-                            
                         case .success(let image):
                             image
                                 .resizable()
                                 .scaledToFill()
-                            
                         case .failure:
                             Color.gray.opacity(0.2)
-                            
                         @unknown default:
                             EmptyView()
                         }
@@ -61,11 +39,13 @@ struct RecipeCard: View {
                 .frame(maxWidth: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 
-                
-                
                 Button {
                     isFavorite.toggle()
-                    addToFavorites(recipe: recipe)
+                    if isFavorite {
+                        addToFavorites(recipe: recipe)
+                    } else {
+                        removeFromFavorites(recipe: recipe)
+                    }
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .foregroundColor(isFavorite ? .red : .white)
@@ -76,12 +56,10 @@ struct RecipeCard: View {
                 .padding(10)
             }
             
-            
             Text(recipe.title)
                 .font(.headline)
                 .lineLimit(2)
                 .foregroundColor(.primary)
-            
             
             HStack(spacing: 4) {
                 Text("\(recipe.cookingTime) min")
@@ -92,8 +70,34 @@ struct RecipeCard: View {
             .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color.red.opacity(0.06))
+        .background(Color.green.opacity(0.06))
         .cornerRadius(24)
         .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+    }
+    
+    // MARK: - Private Firestore helpers
+    private func favoritesRef(for recipe: Recipe) -> DocumentReference? {
+        guard let uid = Auth.auth().currentUser?.uid else { return nil }
+        return Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .collection("favorites")
+            .document(recipe.id)
+    }
+    
+    private func addToFavorites(recipe: Recipe) {
+        favoritesRef(for: recipe)?.setData([
+            "title":        recipe.title,
+            "cookingTime":  recipe.cookingTime,
+            "calories":     recipe.calories,
+            "imageUrl":     recipe.imageUrl,
+            "category":     recipe.category,
+            "ingredients":  recipe.ingredients,
+            "instructions": recipe.instructions
+        ])
+    }
+    
+    private func removeFromFavorites(recipe: Recipe) {
+        favoritesRef(for: recipe)?.delete()
     }
 }

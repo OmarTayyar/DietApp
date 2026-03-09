@@ -10,11 +10,9 @@ import SwiftUI
 struct MainTabbarView: View {
 
     var body: some View {
-        
         TabView {
-            
             NavigationStack {
-               MainView()
+                MainView()
             }
             .tabItem {
                 Image(systemName: "book.fill")

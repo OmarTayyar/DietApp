@@ -99,7 +99,7 @@ struct RangeSlider: View {
                             .onEnded { _ in activeThumb = nil }
                     )
             }
-            .frame(height: 28) 
+            .frame(height: 28)
             .contentShape(Rectangle())
         }
         .frame(height: 28)

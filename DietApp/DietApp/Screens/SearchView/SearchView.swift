@@ -4,7 +4,6 @@
 //
 //  Created by Omar Yunusov on 27.02.26.
 //
-
 import SwiftUI
 
 struct SearchView: View {
@@ -14,47 +13,45 @@ struct SearchView: View {
     @State private var showFilter = false
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                if viewModel.filteredRecipes.isEmpty {
-                    Spacer()
-                    Text("No dishes found")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                    Spacer()
-                } else {
-                    List {
-                        ForEach(viewModel.filteredRecipes) { recipe in
-                            NavigationLink {
-                                DetailView(recipe: recipe)
-                            } label: {
-                                FavoriteRowView(recipe: recipe)
-                            }
-                            .buttonStyle(.plain)
+        VStack {
+            if viewModel.filteredRecipes.isEmpty && !viewModel.searchText.isEmpty {
+                Spacer()
+                Text("No dishes found")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                Spacer()
+            } else {
+                List {
+                    ForEach(viewModel.filteredRecipes) { recipe in
+                        NavigationLink {
+                            DetailView(recipe: recipe)
+                        } label: {
+                            FavoriteRowView(recipe: recipe)
                         }
-                    }
-                    .listStyle(.plain)
-                }
-            }
-            .navigationTitle("Search")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showFilter.toggle()
-                    } label: {
-                        Image(systemName: "slider.horizontal.3")
+                        .buttonStyle(.plain)
                     }
                 }
+                .listStyle(.plain)
             }
-            .searchable(
-                text: $viewModel.searchText,
-                isPresented: $isSearchFieldFocused,
-                placement: .navigationBarDrawer(displayMode: .always),
-                prompt: "Search dishes..."
-            )
-            .onAppear {
-                isSearchFieldFocused = true
+        }
+        .navigationTitle("Search")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showFilter.toggle()
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
             }
+        }
+        .searchable(
+            text: $viewModel.searchText,
+            isPresented: $isSearchFieldFocused,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: "Search dishes..."
+        )
+        .onAppear {
+            isSearchFieldFocused = true
         }
         .sheet(isPresented: $showFilter) {
             FilterSheetView(viewModel: viewModel)

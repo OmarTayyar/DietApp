@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import FirebaseAuth
+import SwiftUI
 import Combine
 
 final class FavoritesViewModel: ObservableObject {
@@ -21,48 +22,42 @@ final class FavoritesViewModel: ObservableObject {
         db.collection("users")
             .document(uid)
             .collection("favorites")
-            .getDocuments { snapshot, error in
-                
+            .getDocuments { [weak self] snapshot, error in
+                guard let self else { return }
                 guard let documents = snapshot?.documents else { return }
                 
-                self.favorites = documents.compactMap { doc in
+                let fetched = documents.compactMap { doc -> Recipe? in
                     let data = doc.data()
-                    
                     return Recipe(
                         id: doc.documentID,
-                        title: data["title"] as? String ?? "",
-                        cookingTime: data["cookingTime"] as? Int ?? 0,
-                        calories: data["calories"] as? Int ?? 0,
-                        imageUrl: data["imageUrl"] as? String ?? "",
-                        category: data["category"] as? String ?? "",
-                        ingredients: data["ingredients"] as?  [String] ?? [],
+                        title:        data["title"]       as? String ?? "",
+                        cookingTime:  data["cookingTime"] as? Int    ?? 0,
+                        calories:     data["calories"]    as? Int    ?? 0,
+                        imageUrl:     data["imageUrl"]    as? String ?? "",
+                        category:     data["category"]    as? String ?? "",
+                        ingredients:  data["ingredients"] as? [String] ?? [],
                         instructions: data["instructions"] as? [String] ?? []
                     )
+                }
+                
+                DispatchQueue.main.async {
+                    self.favorites = fetched
                 }
             }
     }
     
-    func delete(_ recipe: Recipe) {
+    func deleteFavorite(at offsets: IndexSet) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        db.collection("users")
-            .document(uid)
-            .collection("favorites")
-            .document(recipe.id)
-            .delete()
+        offsets.forEach { index in
+            let recipe = favorites[index]
+            db.collection("users")
+                .document(uid)
+                .collection("favorites")
+                .document(recipe.id)
+                .delete()
+        }
+        // Update local array immediately for responsive UI
+        favorites.remove(atOffsets: offsets)
     }
-    
-    func deleteFavorite(at offsets: IndexSet) {
-           guard let uid = Auth.auth().currentUser?.uid else { return }
-           
-           offsets.forEach { index in
-               let recipe = favorites[index]
-               
-               db.collection("users")
-                   .document(uid)
-                   .collection("favorites")
-                   .document(recipe.id)
-                   .delete()
-           }
-       }
 }
