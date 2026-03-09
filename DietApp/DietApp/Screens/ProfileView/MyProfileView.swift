@@ -258,3 +258,5 @@ struct MyProfileView: View {
         FirebaseAuthService.shared.signOut()
     }
 }
+
+

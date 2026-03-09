@@ -115,7 +115,6 @@ class DietPlanViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Reset
     func resetPlan() {
         WeekDay.allCases.forEach { selectedRecipeIds[$0] = [] }
         saveDietPlan()
