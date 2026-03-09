@@ -8,14 +8,6 @@ A modern iOS meal planning application built with **SwiftUI** and **Firebase**. 
 
 ---
 
-## 📱 Screenshots
-
-| Login | Main | Detail | My Diet | Profile |
-|-------|------|--------|---------|---------|
-| Auth screen with Sign In / Sign Up | Recipe grid with category filters | Full recipe detail with ingredients & steps | Weekly diet plan grouped by day | Profile with dark mode & photo upload |
-
----
-
 ## 🚀 Features
 
 ### Authentication
