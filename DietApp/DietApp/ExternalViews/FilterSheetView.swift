@@ -12,7 +12,7 @@ struct FilterSheetView: View {
     @ObservedObject var viewModel: SearchViewModel
     @Environment(\.dismiss) private var dismiss
     
-    
+    // Use RecipeCategory enum (excluding .all)
     private let categories = RecipeCategory.allCases
         .filter { $0 != .all }
         .map { $0.rawValue }
@@ -24,7 +24,7 @@ struct FilterSheetView: View {
                 Text("Filters")
                     .font(.largeTitle.bold())
                 
-                
+                // MARK: Categories
                 Text("Category")
                     .font(.headline)
                 
@@ -33,7 +33,7 @@ struct FilterSheetView: View {
                     selected: $viewModel.selectedCategories
                 )
                 
-               
+                // MARK: Cooking Time
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Cooking time")
                         .font(.headline)
@@ -44,7 +44,7 @@ struct FilterSheetView: View {
                     RangeSlider(range: $viewModel.cookingTimeRange, bounds: 0...120, step: 1)
                 }
                 
-                
+                // MARK: Calories
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Dish calories")
                         .font(.headline)

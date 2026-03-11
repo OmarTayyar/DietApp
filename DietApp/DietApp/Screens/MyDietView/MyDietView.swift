@@ -1,5 +1,5 @@
 //
-//  DietView.swift
+//  MyDietView.swift
 //  DietApp
 //
 //  Created by Omar Yunusov on 27.02.26.

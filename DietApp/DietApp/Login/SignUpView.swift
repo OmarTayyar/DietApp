@@ -2,11 +2,11 @@
 //  SignUpView.swift
 //  DietApp
 //
-//  Created by Omar Yunusov on 10.03.26.
+//  Created by Omar Yunusov on 06.03.26.
 //
 
 import SwiftUI
-import FirebaseAuth
+
 
 struct SignUpView: View {
     
@@ -16,7 +16,6 @@ struct SignUpView: View {
     @State private var errorMessage = ""
     @State private var isLoading = false
     @Environment(\.dismiss) private var dismiss
-    @State private var isSuccess = false
     
     var body: some View {
         NavigationStack {
@@ -51,12 +50,7 @@ struct SignUpView: View {
                 }
                 .padding(.horizontal, 32)
                 
-                if isSuccess {
-                    Text("✅ Signed up successfully!")
-                        .foregroundColor(.green)
-                        .font(.callout.bold())
-                        .padding(.horizontal, 32)
-                } else if !errorMessage.isEmpty {
+                if !errorMessage.isEmpty {
                     Text(errorMessage)
                         .foregroundColor(.red)
                         .font(.caption)
@@ -107,20 +101,14 @@ struct SignUpView: View {
         }
         isLoading = true
         FirebaseAuthService.shared.registerUser(email: email, password: password) { result in
-            DispatchQueue.main.async {
+            
                 isLoading = false
                 switch result {
                 case .success:
-                    isLoading = false
-                    isSuccess = true
-                    try? FirebaseAuth.Auth.auth().signOut()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        dismiss()
-                    }
+                    dismiss()
                 case .failure(let error):
                     errorMessage = error.localizedDescription
                 }
-            }
         }
     }
 }

@@ -11,18 +11,10 @@ import Combine
 final class FirebaseAuthService: ObservableObject {
     
     static let shared = FirebaseAuthService()
-        
-        @Published var isLoggedIn: Bool = false
-        
-        private init() {
-            listenToAuthState { user in
-                self.isLoggedIn = user != nil
-            }
-        }
     
     @Published var isLoggedIn: Bool = false
     
-    // Keep handle to avoid memory leak
+    
     private var authHandle: AuthStateDidChangeListenerHandle?
     
     private init() {

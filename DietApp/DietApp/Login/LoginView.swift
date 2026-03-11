@@ -76,18 +76,19 @@ struct LoginView: View {
                         .textInputAutocapitalization(.never)
                         .keyboardType(.emailAddress)
                         .padding()
-                        .background(Color(.systemBackground))
+                        .background(Color.white)
                         .cornerRadius(20)
-                        .shadow(color: Color(.label).opacity(0.1), radius: 3)
+                        .shadow(radius: 3)
                         .padding(.top, 24)
 
                     SecureField("Password", text: $password)
                         .padding()
-                        .background(Color(.systemBackground))
+                        .background(Color.white)
                         .cornerRadius(20)
-                        .shadow(color: Color(.label).opacity(0.1), radius: 3)  
+                        .shadow(radius: 3)
                 }
                 .padding(.horizontal, 32)
+
                 Text("OR")
                     .font(.subheadline)
                     .padding(.top, 16)
