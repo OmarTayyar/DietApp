@@ -12,12 +12,31 @@ struct AddDishesView: View {
     @ObservedObject var viewModel: DietPlanViewModel
     @Environment(\.dismiss) private var dismiss
 
+    @State private var searchText: String = ""
+    @State private var isSearching: Bool = false
+    @FocusState private var searchFocused: Bool
+
+    // MARK: - Filtered recipes
+    private var displayedRecipes: [Recipe] {
+        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return viewModel.allRecipes
+        }
+        return viewModel.allRecipes.filter {
+            $0.title.lowercased().contains(searchText.lowercased())
+        }
+    }
+
     // MARK: - Body
     var body: some View {
         VStack(spacing: 0) {
 
             // MARK: Header
             headerBar
+
+            // MARK: Search Bar (inline, shown when active)
+            if isSearching {
+                searchBar
+            }
 
             // MARK: Day Selector
             daySelector
@@ -26,6 +45,17 @@ struct AddDishesView: View {
             if viewModel.isLoading {
                 Spacer()
                 ProgressView()
+                Spacer()
+            } else if displayedRecipes.isEmpty {
+                Spacer()
+                VStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 40))
+                        .foregroundColor(Color(.systemGray3))
+                    Text("No dishes found")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
                 Spacer()
             } else {
                 recipeGrid
@@ -49,10 +79,22 @@ struct AddDishesView: View {
             Spacer()
 
             HStack(spacing: 12) {
-                Circle()
-                    .fill(Color(.systemGray5))
-                    .frame(width: 38, height: 38)
-                    .overlay(Image(systemName: "magnifyingglass").foregroundColor(.primary))
+                // Search button — toggles search bar
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isSearching.toggle()
+                        if !isSearching { searchText = "" }
+                    }
+                    if isSearching { searchFocused = true }
+                }) {
+                    Circle()
+                        .fill(isSearching ? Color.green : Color(.systemGray5))
+                        .frame(width: 38, height: 38)
+                        .overlay(
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(isSearching ? .white : .primary)
+                        )
+                }
 
                 Circle()
                     .fill(Color(.systemGray5))
@@ -70,6 +112,34 @@ struct AddDishesView: View {
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .background(Color(.systemBackground))
+    }
+
+    // MARK: - Search Bar
+    private var searchBar: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+
+            TextField("Search dishes...", text: $searchText)
+                .focused($searchFocused)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+
+            if !searchText.isEmpty {
+                Button(action: { searchText = "" }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(Color(.systemBackground))
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     // MARK: - Day Selector (horizontal scroll)
@@ -116,7 +186,7 @@ struct AddDishesView: View {
                 columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                 spacing: 12
             ) {
-                ForEach(viewModel.allRecipes) { recipe in
+                ForEach(displayedRecipes) { recipe in
                     AddDishCard(recipe: recipe, isSelected: viewModel.isSelected(recipe)) {
                         viewModel.toggleRecipe(recipe)
                     }
@@ -162,3 +232,4 @@ struct AddDishesView: View {
         )
     }
 }
+

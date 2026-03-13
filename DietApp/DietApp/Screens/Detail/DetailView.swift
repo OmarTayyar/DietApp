@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct DetailView: View {
     
@@ -22,26 +23,15 @@ struct DetailView: View {
                     
                     GeometryReader { proxy in
                         let width = proxy.size.width
-                        AsyncImage(url: URL(string: recipe.imageUrl)) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: width, height: headerHeight)
-                                    .clipped()
-                            case .empty:
-                                Color.gray.opacity(0.2)
-                                    .frame(width: width, height: headerHeight)
-                            case .failure:
-                                Color.gray.opacity(0.2)
-                                    .frame(width: width, height: headerHeight)
-                            @unknown default:
+                        KFImage(URL(string: recipe.imageUrl))
+                            .placeholder {
                                 Color.gray.opacity(0.2)
                                     .frame(width: width, height: headerHeight)
                             }
-                        }
-                        .transaction { tx in tx.animation = nil }
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: width, height: headerHeight)
+                            .clipped()
                     }
                     .frame(height: headerHeight)
                     

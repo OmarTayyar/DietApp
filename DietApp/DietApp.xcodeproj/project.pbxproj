@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA2F37502F63800700A353A6 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = CA2F374F2F63800700A353A6 /* Kingfisher */; };
+		CA2F37572F6389B700A353A6 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = CA2F37562F6389B700A353A6 /* GoogleSignIn */; };
+		CA2F37592F6389B700A353A6 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CA2F37582F6389B700A353A6 /* GoogleSignInSwift */; };
 		CA52927C2F444F3600740787 /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = CA52927B2F444F3600740787 /* FirebaseAI */; };
 		CA52927E2F444F3600740787 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = CA52927D2F444F3600740787 /* FirebaseAILogic */; };
 		CA52931A2F49193700740787 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CA5293192F49193700740787 /* FirebaseAuth */; };
@@ -17,9 +20,22 @@
 		CA5292312F3FD81500740787 /* DietApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DietApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CA2F37542F63880100A353A6 /* Exceptions for "DietApp" folder in "DietApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CA5292302F3FD81500740787 /* DietApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CA5292332F3FD81500740787 /* DietApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CA2F37542F63880100A353A6 /* Exceptions for "DietApp" folder in "DietApp" target */,
+			);
 			path = DietApp;
 			sourceTree = "<group>";
 		};
@@ -32,8 +48,11 @@
 			files = (
 				CA52927E2F444F3600740787 /* FirebaseAILogic in Frameworks */,
 				CAC37CF82F4F4AE100287F13 /* FirebaseFirestore in Frameworks */,
+				CA2F37592F6389B700A353A6 /* GoogleSignInSwift in Frameworks */,
 				CA52931A2F49193700740787 /* FirebaseAuth in Frameworks */,
 				CA52927C2F444F3600740787 /* FirebaseAI in Frameworks */,
+				CA2F37502F63800700A353A6 /* Kingfisher in Frameworks */,
+				CA2F37572F6389B700A353A6 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +107,9 @@
 				CA52927D2F444F3600740787 /* FirebaseAILogic */,
 				CA5293192F49193700740787 /* FirebaseAuth */,
 				CAC37CF72F4F4AE100287F13 /* FirebaseFirestore */,
+				CA2F374F2F63800700A353A6 /* Kingfisher */,
+				CA2F37562F6389B700A353A6 /* GoogleSignIn */,
+				CA2F37582F6389B700A353A6 /* GoogleSignInSwift */,
 			);
 			productName = DietApp;
 			productReference = CA5292312F3FD81500740787 /* DietApp.app */;
@@ -119,6 +141,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				CA5292412F412AF900740787 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				CA2F374E2F63800700A353A6 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				CA2F37552F6389B700A353A6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CA5292322F3FD81500740787 /* Products */;
@@ -282,6 +306,7 @@
 				DEVELOPMENT_TEAM = HFG25F2TD2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DietApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -314,6 +339,7 @@
 				DEVELOPMENT_TEAM = HFG25F2TD2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DietApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -360,6 +386,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		CA2F374E2F63800700A353A6 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.8.0;
+			};
+		};
+		CA2F37552F6389B700A353A6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
 		CA5292412F412AF900740787 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -371,6 +413,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		CA2F374F2F63800700A353A6 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA2F374E2F63800700A353A6 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		CA2F37562F6389B700A353A6 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA2F37552F6389B700A353A6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		CA2F37582F6389B700A353A6 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA2F37552F6389B700A353A6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		CA52927B2F444F3600740787 /* FirebaseAI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CA5292412F412AF900740787 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

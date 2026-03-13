@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
+import Kingfisher
 
 struct RecipeCard: View {
     
@@ -20,20 +21,12 @@ struct RecipeCard: View {
             ZStack(alignment: .topTrailing) {
                 
                 ZStack {
-                    AsyncImage(url: URL(string: recipe.imageUrl)) { phase in
-                        switch phase {
-                        case .empty:
+                    KFImage(URL(string: recipe.imageUrl))
+                        .placeholder {
                             Color.gray.opacity(0.1)
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        case .failure:
-                            Color.gray.opacity(0.2)
-                        @unknown default:
-                            EmptyView()
                         }
-                    }
+                        .resizable()
+                        .scaledToFill()
                 }
                 .aspectRatio(1.3, contentMode: .fit)
                 .frame(maxWidth: .infinity)

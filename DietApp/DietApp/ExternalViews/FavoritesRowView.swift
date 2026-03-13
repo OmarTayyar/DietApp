@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct FavoriteRowView: View {
     
@@ -14,13 +15,12 @@ struct FavoriteRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             
-            AsyncImage(url: URL(string: recipe.imageUrl)) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Color.gray.opacity(0.1)
-            }
+            KFImage(URL(string: recipe.imageUrl))
+                .placeholder {
+                    Color.gray.opacity(0.1)
+                }
+                .resizable()
+                .scaledToFill()
             .frame(width: 80, height: 80)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             

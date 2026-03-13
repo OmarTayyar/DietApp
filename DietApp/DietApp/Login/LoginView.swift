@@ -12,6 +12,7 @@ struct LoginView: View {
     @State private var password = ""
     @State private var errorMessage = ""
     @State private var showSignUp = false
+    @State private var isGoogleLoading = false
     
     var body: some View {
         NavigationStack {
@@ -61,7 +62,7 @@ struct LoginView: View {
                             .fontWeight(.bold)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background()
+                            .background(Color.clear)
                             .foregroundColor(Color(hex: "#79C314"))
                             .cornerRadius(8)
                             .overlay(
@@ -76,31 +77,55 @@ struct LoginView: View {
                         .textInputAutocapitalization(.never)
                         .keyboardType(.emailAddress)
                         .padding()
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(20)
-                        .shadow(radius: 3)
+                        .shadow(color: Color(.label).opacity(0.1), radius: 3)
                         .padding(.top, 24)
 
                     SecureField("Password", text: $password)
                         .padding()
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(20)
-                        .shadow(radius: 3)
+                        .shadow(color: Color(.label).opacity(0.1), radius: 3)
                 }
                 .padding(.horizontal, 32)
-
                 Text("OR")
                     .font(.subheadline)
                     .padding(.top, 16)
 
                 HStack {
+                    // MARK: - Google Sign-In
                     Button(action: {
-                        print("Google Login")
+                        guard !isGoogleLoading else { return }
+                        isGoogleLoading = true
+                        errorMessage = ""
+
+                        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                              let rootVC = scene.windows.first?.rootViewController else {
+                            errorMessage = "Cannot find root view controller"
+                            isGoogleLoading = false
+                            return
+                        }
+
+                        FirebaseAuthService.shared.signInWithGoogle(presenting: rootVC) { result in
+                            isGoogleLoading = false
+                            switch result {
+                            case .success:
+                                break // RootView auth listener handles navigation
+                            case .failure(let error):
+                                errorMessage = error.localizedDescription
+                            }
+                        }
                     }) {
                         HStack {
-                            Image(.googleLogo)
-                                .resizable()
-                                .frame(width: 24, height: 24)
+                            if isGoogleLoading {
+                                ProgressView()
+                                    .frame(width: 24, height: 24)
+                            } else {
+                                Image(.googleLogo)
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
+                            }
                             Text("Google")
                                 .fontWeight(.bold)
                                 .foregroundStyle(.black)
@@ -111,25 +136,7 @@ struct LoginView: View {
                         .cornerRadius(30)
                         .shadow(radius: 5)
                     }
-
-                    Button(action: {
-                        print("Apple Login")
-                    }) {
-                        HStack {
-                            Image(systemName: "applelogo")
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .foregroundStyle(.black)
-                            Text("Apple")
-                                .fontWeight(.bold)
-                                .foregroundStyle(.black)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(30)
-                        .shadow(radius: 5)
-                    }
+                    .disabled(isGoogleLoading)
                 }
                 .padding(.top, 16)
                 .padding(.horizontal, 32)
@@ -149,3 +156,4 @@ struct LoginView: View {
         }
     }
 }
+

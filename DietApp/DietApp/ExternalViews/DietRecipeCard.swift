@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct DietRecipeCard: View {
 
@@ -16,16 +17,12 @@ struct DietRecipeCard: View {
 
             // Image
             ZStack(alignment: .topTrailing) {
-                AsyncImage(url: URL(string: recipe.imageUrl)) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    default:
+                KFImage(URL(string: recipe.imageUrl))
+                    .placeholder {
                         Rectangle().fill(Color(.systemGray5))
                     }
-                }
+                    .resizable()
+                    .scaledToFill()
                 .frame(width: 160, height: 130)
                 .clipped()
                 .cornerRadius(14)
